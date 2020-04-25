@@ -25,18 +25,18 @@ def get_dict():
     synonym_dict[('MS-ISE', 'MS ISE', 'Masters in Industrial and Systems Engineering', 'MS in Industrial and Systems Engineering', 'Masters in ISE', 'MS in ISE')] = 'MSISE'
     synonym_dict[('Computer Engineering', 'Computers Engineering')] = 'CMPE'
     synonym_dict[('Software Engineering', 'SW Engineering')] = 'SE'
-    synonym_dict[('General Education')] = 'GE'
+    synonym_dict[('General Education', 'general education')] = 'GE'
     synonym_dict[('Writing skills test', 'Writing skill test')] = 'WST'
     synonym_dict[('lower division', 'lower-division')] = 'LD'
-    synonym_dict[('California state university')] = 'CSU'
-    synonym_dict[('Former Student Returning')] = 'FSR'
-    synonym_dict[('Grade point average')] = 'GPA'
-    synonym_dict[('Open University')] = 'OU'
+    synonym_dict[('California state university','CA state university')] = 'CSU'
+    synonym_dict[('Former Student Returning', 'former student returning')] = 'FSR'
+    synonym_dict[('Grade point average', 'grade point avg')] = 'GPA'
+    synonym_dict[('Open University', 'open uni')] = 'OU'
     synonym_dict[('full-time', 'fulltime')] = 'full time'
     synonym_dict[('Free Application for Federal Student Aid', 'Free Application for Federal Students Aid')] = 'FAFSA'
     synonym_dict[('MS in Computer Science', 'Masters in CS', 'Masters in Computer Science', 'MS in CS')] = 'MSCS'
     synonym_dict[('part-time', 'parttime')] = 'part time'
-    synonym_dict[('Child and Adolescent Development')] = 'ChAD'
+    synonym_dict[('Child and Adolescent Development', 'child and adolescent development')] = 'ChAD'
     synonym_dict[('credit/no-credit', 'credit no-credit')] = 'CR/NCR'
     return synonym_dict
 
@@ -62,10 +62,11 @@ def create_app():
     def ask():
         if request.method == "POST":
             sentence = str(request.data.get('question'))
-            print(sentence)
+            # print("=======> Before normalizing : ",sentence)
             nlp = spacy.load('en_core_web_sm')
             s1 = nlp(sentence)
             s1 = normalize_string(str(s1))
+            print("=======> After calling function normalize_string : ", s1)
             ps = PorterStemmer()
             s1_stem = ""
             for word in s1:
