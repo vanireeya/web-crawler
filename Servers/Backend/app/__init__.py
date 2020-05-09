@@ -19,6 +19,35 @@ import json
 pd.set_option('display.max_colwidth', -1)
 
 
+def normalize_string(string):
+    test_string = ""
+    for word in string:
+        test_string += word.text.lower()
+        test_string += " "
+    synonym_dict = get_dict()
+
+    for key in synonym_dict:
+        for t in key:
+            strng = t.lower()
+            if strng in test_string:
+                test_string = test_string.replace(strng, synonym_dict[key])
+
+    return (test_string)
+
+
+def get_dict():
+
+    compare = ['F1 student','SJSU','San Jose State University','ISSS', 'International student and scholar services',
+    'International','Graduate admissions and program evaluation',"graduate", "application", "deadline"
+    'GAPE',"MSSE",'MSISE','CMPE','WST','GPA','MSCS',"full time",
+    'Masters of Science in Software Engineering','Masters', "Health center","health","appointment",
+    'Admission',"Software Engineering","Engineering","Writing skills test","Open University","Grade point average"]
+    
+    
+    
+    return compare
+
+
 def create_app():
     app = FlaskAPI(__name__, instance_relative_config=True)
 
@@ -33,54 +62,79 @@ def create_app():
             incoming_question = str(request.data.get('question'))
             context = str(request.data.get('context'))
             print("========> The Context is : ", context)
-            url = "http://localhost:8080/programab"
-            options = {"question": incoming_question}
-            # print("options:================>", options)
-            answer_from_ab = requests.post(url, data=json.dumps(options))
+            
+            incoming_question = incoming_question.lower()
+            
+            
+            synonym_dict = get_dict()
+            flag = 0
+            for key in synonym_dict:
+                key = key.lower()
+                if key in incoming_question:
+                    print(key)
+                    print(incoming_question)
+                    flag = 1
+                    break
 
-
-            answer_from_ab = answer_from_ab.text
-            index = answer_from_ab.find("?")
-            if(index == -1):
-                response = jsonify({
-                    'answer': answer_from_ab
-                })
-                response.status_code = 200
-                return response
-            else:
+            if(flag == 1):
                 url = "http://localhost:5001/nlp-normalize/"
                 options = {'question': incoming_question}
                 preprocessed = requests.post(url, data=options)
                 preprocessed = preprocessed.json()
                 print("======> Data returned from nlp-normalize API  : \n", preprocessed)
 
-
                 url = "http://localhost:5002/similarity/"
-                options = {'normalized_incoming': preprocessed['data'],"context":context}
+                options = {
+                    'normalized_incoming': preprocessed['data'], "context": context}
                 matchedQuestion = requests.post(url, data=options)
                 matchedQuestion = matchedQuestion.json()
-                print("======> Data returned from similarity API  : \n", matchedQuestion)
+                print("======> Data returned from similarity API  : \n",
+                      matchedQuestion)
                 print("\n\n\n")
                 print(" matchedQuestion[data] : ", matchedQuestion["data"])
 
-
-
-                # found = chatbot_data[chatbot_data['Question'].str.contains(
-                #     matchedQuestion["data"], na=False)]
-                # print("FOUND!!!!!\n", found)
-                # ans = found['Answer'].to_string()
-                # ans = ans[3:]
-                # ans = re.sub(' +', ' ', ans).strip()
-                # print("Final answer : \n", ans)
-
-                # filter1 = chatbot_data["Question"] == matchedQuestion["data"]
-                # print("filter : ", filter1)
-                # chatbot_data.where(filter1, inplace = True)
                 response = jsonify({
                     'answer': matchedQuestion["data"],
                     'context': matchedQuestion["context"]
                 })
                 response.status_code = 200
                 return response
-    return app
+            else:
+                url = "http://localhost:8080/programab"
+                options = {"question": incoming_question}
+                answer_from_ab = requests.post(url, data=json.dumps(options))
 
+                answer_from_ab = answer_from_ab.text
+                index = answer_from_ab.find("?")
+                index = -1
+                if(index == -1):
+                    response = jsonify({
+                        'answer': answer_from_ab
+                    })
+                    response.status_code = 200
+                    return response
+                else:
+                    url = "http://localhost:5001/nlp-normalize/"
+                    options = {'question': incoming_question}
+                    preprocessed = requests.post(url, data=options)
+                    preprocessed = preprocessed.json()
+                    print("======> Data returned from nlp-normalize API  : \n", preprocessed)
+
+                    url = "http://localhost:5002/similarity/"
+                    options = {
+                        'normalized_incoming': preprocessed['data'], "context": context}
+                    matchedQuestion = requests.post(url, data=options)
+                    matchedQuestion = matchedQuestion.json()
+                    print("======> Data returned from similarity API  : \n",
+                        matchedQuestion)
+                    print("\n\n\n")
+                    print(" matchedQuestion[data] : ", matchedQuestion["data"])
+
+                    response = jsonify({
+                        'answer': matchedQuestion["data"],
+                        'context': matchedQuestion["context"]
+                    })
+                    response.status_code = 200
+                    return response
+   
+    return app

@@ -58,7 +58,7 @@ class Navbar extends Component {
                 console.log("Status Code : ", response.status);
                 if (response.status === 200) {
                     this._sendMessage(response.data.answer)
-                    if (response.data.context !== "" || response.data.context !== null || response.data.context !== undefined) {
+                    if (response.data.context !== "" && response.data.context !== null && response.data.context !== undefined) {
                         this.setState({ context: response.data.context })
                         console.log(this.state.context)
                     }
