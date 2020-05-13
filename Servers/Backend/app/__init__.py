@@ -106,7 +106,7 @@ def create_app():
 
                 answer_from_ab = answer_from_ab.text
                 index = answer_from_ab.find("?")
-                index = -1
+                # index = -1
                 if(index == -1):
                     response = jsonify({
                         'answer': answer_from_ab
