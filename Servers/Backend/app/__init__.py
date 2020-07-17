@@ -37,10 +37,10 @@ def normalize_string(string):
 
 def get_dict():
 
-    compare = ['F1 student','SJSU','San Jose State University','ISSS', 'International student and scholar services',
-    'International','Graduate admissions and program evaluation',"graduate", "application", "deadline"
-    'GAPE',"MSSE",'MSISE','CMPE','WST','GPA','MSCS',"full time",
-    'Masters of Science in Software Engineering','Masters', "Health center","health","appointment",
+    compare = ['F1 student','University','SJSU','San Jose State University','ISSS', 'International student and scholar services',
+    'International','Graduate admissions and program evaluation',"graduate", "application", "deadline",'cpt','opt','information',
+    'GAPE',"MSSE",'MSISE','CMPE','WST','GPA','MSCS',"full time","student","students","misc", "apply","last day","last",
+    'Masters of Science in Software Engineering','Masters', "Health center","health","appointment","major","contact",
     'Admission',"Software Engineering","Engineering","Writing skills test","Open University","Grade point average"]
     
     
@@ -93,6 +93,10 @@ def create_app():
                 print("\n\n\n")
                 print(" matchedQuestion[data] : ", matchedQuestion["data"])
 
+                if(matchedQuestion["similarity"] is not None):
+                    if(matchedQuestion["similarity"] == 0.0):
+                        matchedQuestion["data"] = "Can you please give me more details regarding the department? Visit https://www.sjsu.edu/gup/FAQs/index.html for more information."
+
                 response = jsonify({
                     'answer': matchedQuestion["data"],
                     'context': matchedQuestion["context"]
@@ -106,7 +110,7 @@ def create_app():
 
                 answer_from_ab = answer_from_ab.text
                 index = answer_from_ab.find("?")
-                # index = -1
+                index = -1
                 if(index == -1):
                     response = jsonify({
                         'answer': answer_from_ab

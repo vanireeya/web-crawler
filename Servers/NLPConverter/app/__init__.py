@@ -54,6 +54,7 @@ def get_dict():
     synonym_dict[('Child and Adolescent Development',
                   'child and adolescent development')] = 'ChAD'
     synonym_dict[('credit/no-credit', 'credit no-credit')] = 'CR/NCR'
+    synonym_dict[('last day','deadline')] = 'deadline'
     return synonym_dict
 
 

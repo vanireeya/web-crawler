@@ -130,7 +130,7 @@ def create_app():
             # })
 
             response = jsonify({
-                'data': chatbot_data.loc[index][1], 'context' :context
+                'data': chatbot_data.loc[index][1], 'context' :context, 'similarity':m
 
             })
             response.status_code = 200
